@@ -1,0 +1,24 @@
+// createImportData()创建模拟console中导入的csv数据文件
+def createImportData(filePath, pointName, startTime, endTime, n){
+
+	// 第一步：创建模拟数据
+	time = startTime..endTime
+	时间 = temporalFormat(time, "yyyy/MM/dd HH:mm:ss")
+	时间 = take(时间, n)
+	value = rand(80.0, n)
+	t = table(时间, value)
+	saveText(t, filePath)
+	schemaTB = extractTextSchema(filePath)
+	update schemaTB set name = pointName
+	update schemaTB set type = "STRING" where name="时间"
+	t=loadText(filePath,,schemaTB)
+	saveText(t, filePath)	
+}
+
+filePath = "F:/Data/vsOpenPlant/test.csv" // 存储位置
+pointName = `时间`W3.CLASS001.P500 // OpenPlant数据控制台导入数据时的固定字段
+startTime = 2020.09.01T00:00:00
+endTime = 2021.01.01T00:00:00
+n = 10000 // 模拟的数据量
+
+createImportData(filePath, pointName, startTime, endTime, n)
