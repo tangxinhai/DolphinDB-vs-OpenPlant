@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openPlant>
+	<Root id="0" name="." desc="Root" ip="115.239.209.234" port="19125" timeout="60" waitTimeout="1800" maxThreads="500" logLevel="3" timeSync="0" mirrorAddress="" mirrorPort="8200" mirrorSize="32768" timediff="28800" forceFK="0" configTime="0" uri="">
+		<Database id="0" UD="0" name="W3" desc="openPlant" dataDir="/hdd/hdd6/openPlant" diskLimit="95" pageSize="4096" cacheSize="128" archiveInterval="3000" archivePeriod="1" archiveSize="1500" autoDeadband="0" lossless="0" hiacsNodes="" configTime="0" uri=""/>
+	</Root>
+</openPlant>
