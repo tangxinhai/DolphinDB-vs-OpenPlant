@@ -15,8 +15,8 @@ def loadCsv(filePath, dbHandle, tableName){
 }
 
 login("admin", "123456")
-filePath = "/hdd/hdd5/dolphindb/data/test.csv" // 存储位置
-pointName = `时间`P500 // OpenPlant数据控制台导入数据时的固定字段
+filePath = "/hdd/hdd5/dolphindb/data/test.csv" //存储位置
+pointName = `时间`P500 //OpenPlant数据控制台导入数据时的固定字段
 dbUrl = "dfs://testDB"
 tableName = "testTable"
 //创建数据库和表
