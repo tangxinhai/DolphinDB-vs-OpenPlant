@@ -1,4 +1,4 @@
-//createDatabaseAndTable函数：创建分区数据库和表
+//创建分区数据库和表
 def createDatabaseAndTable(dbUrl, pointName, tableName){
 	if(existsDatabase(dbUrl)){
 		dropDatabase(dbUrl)
