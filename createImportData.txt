@@ -16,7 +16,7 @@ def createImportData(filePath, pointName, startTime, endTime, n){
 }
 
 filePath = "F:/Data/vsOpenPlant/test.csv" //存储位置
-pointName = `时间`W3.CLASS001.P500 //OpenPlant数据控制台导入数据时的固定字段
+pointName = `时间`W3.C01.P000500 //OpenPlant数据控制台导入数据时的固定字段
 startTime = 2020.09.01T00:00:00
 endTime = 2021.01.01T00:00:00
 n = 100000 //模拟的数据量
