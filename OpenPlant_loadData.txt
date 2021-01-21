@@ -1,0 +1,2 @@
+cd /hdd/hdd6/openPlant/writedata
+./WriteReal -d 115.239.209.234:19125 -id 1024 -c 300000 -i 1000 -r 0.5 -b 50 -t 10 -v
