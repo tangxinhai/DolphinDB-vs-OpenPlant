@@ -1,0 +1,67 @@
+def createDatabase(dbName,tableName, ps1, ps2){
+	tableSchema = table(1:0, `ID`TM`AS`AV, [INT, TIMESTAMP, SHORT, DOUBLE]);
+	db1 = database("", VALUE, ps1)
+	db2 = database("", RANGE, ps2)
+	db = database(dbName,COMPO,[db1,db2])
+	dfsTable = db.createPartitionedTable(tableSchema,tableName,`TM`ID)
+}
+
+def generate1DayData(day, ID, freqPerDay){
+	startTime = day.datetime()
+	IDSize = size(ID)
+	numRecords = freqPerDay * IDSize
+	IDVec = array(INT, numRecords)
+	AV = 50+rand(10.0, numRecords)
+	AS = rand(0 1, numRecords)
+	for(i in 0:IDSize){
+		IDVec[(i*freqPerDay) : ((i+1)*freqPerDay)] = ID[i];
+	}
+	return table(IDVec, take(startTime+0..(freqPerDay-1),numRecords) as TM, AS, AV)
+}
+
+def singleThreadWriting(ID, startDay, days, freqPerDay, numIDPerPartition){
+	t = loadTable("dfs://svmDemo","sensors")
+	for(d in 0:days){
+		index=0
+		do{
+			t.append!(generate1DayData(startDay + d, ID[index+0..(numIDPerPartition-1)], freqPerDay))
+			index += numIDPerPartition
+		}while (index < size(ID))
+	}
+}
+def multipleThreadWriting(ID, startDay, days, freqPerDay, numIDPerPartition, threads) {
+	//split ID to multiple part for parallel writing
+	IDCountPerThread = ceil(ID.size()\threads/numIDPerPartition)*numIDPerPartition
+	ploop(singleThreadWriting{, startDay, days, freqPerDay, numIDPerPartition}, ID.cut(IDCountPerThread))
+}
+
+def mainJob(ID, startDay, days, ps1, ps2, freqPerDay, numIDPerPartition, threads){
+    if(existsDatabase("dfs://svmDemo"))
+		dropDatabase("dfs://svmDemo")
+    createDatabase("dfs://svmDemo","sensors", ps1, ps2)
+
+    if(threads == 1)
+    	submitJob("submit_singleThreadWriting", "write data", singleThreadWriting{ID, startDay, days, freqPerDay, numIDPerPartition})
+    else
+    	submitJob("submit_multipleThreadWriting", "write data", multipleThreadWriting{ID, startDay, days, freqPerDay, numIDPerPartition, threads})
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+login("admin","123456")
+
+freqPerDay=86400
+numMachines=300000
+numMetrics=1
+numMachinesPerPartition=6
+numIDPerPartition=numMachinesPerPartition*numMetrics
+ps1=2020.09.01..2020.12.31
+ps2=(numMetrics*numMachinesPerPartition)*(0..(numMachines/numMachinesPerPartition))+1
+ID =1..(numMachines*numMetrics)
+startDay=2020.10.01
+//写入多少天的数据
+days = 1
+//多少个线程并行写入
+threads = 10
+
+mainJob(ID, startDay, days, ps1, ps2, freqPerDay, numIDPerPartition, threads)
