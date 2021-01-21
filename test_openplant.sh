@@ -1,4 +1,5 @@
-# 安装 OpenPlant
+##OpenPlant server
+# 安装 
 unzip openPlant-5.0.6-linux-x64-hs.zip
 
 # 编辑配置文件
