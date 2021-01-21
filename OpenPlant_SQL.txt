@@ -1,0 +1,74 @@
+from OPAPI_36 import *
+import time
+import _thread
+
+def executeQuery():
+    'SQL(增、删、改、查)'
+    host='115.239.209.234'
+    port=19125
+    timeout=60
+    user='sis'
+    password='openplant'
+    #建立连接
+    con=Connect(host,port,timeout,user,password)
+    print(con.isAlive())
+    #执行SQL语句，查询Point表中，GN为"W3.NODE.X1","W3.NODE.X2"的ID,PN,RT,UD信息
+    start=time.time()
+    resultSet=con.executeQuery("select * from Archive where GN='W3.CLASS301.P301' and TM='2021-01-16 05:36:18.000'")
+    end=time.time()
+    try:
+        while resultSet.Next(): #Next()执行一次，游标下移一行
+            colNum=resultSet.columnsNum  #获取列个数
+            for i in range(colNum):
+                colName=resultSet.columnLabel(i)    #获取第i列名字
+                colValue=resultSet.getValue(i)  #获取第i列值
+                print(colName,':',colValue)
+    except Exception as e:
+        print('error:',e)
+    finally:
+        resultSet.close()   #释放内存
+    print("Use time: %s ms" % ((end - start)*1000))
+    con.close() #关闭连接，千万不要忘记！！！
+
+executeQuery()
+
+
+#SQL1
+select * from Archive where GN='W3.CLASS301.P301' and TM='2021-01-16 05:36:18.000'
+#未缓存：46ms
+#缓存：10ms
+
+#SQL2
+select * from Archive where GN in ('W3.CLASS010.P180','W3.CLASS150.P230','W3.CLASS360.P350') and TM between '2021-01-15 23:00:00' and '2021-01-15 23:30:00'
+#未缓存：220ms
+#缓存：30ms
+
+#SQL3
+select * from Archive where GN in ('W3.CLASS060.P300','W3.CLASS186.P200','W3.CLASS430.P200') and TM between '2021-01-16 01:00:00' and '2021-01-16 02:00:00' order by AV limit 0,20
+#未缓存：746ms
+#缓存：25ms
+
+#SQL4
+select TM as One_minute, MAXV, MINV from Stat where interval='1m' and GN='W3.CLASS355.P320' and TM between '2021-01-15 18:00:00' and '2021-01-16 18:00:00' group by One_minute
+#未缓存：1819ms
+#缓存：50ms
+
+#SQL5
+select TM as Time, GN as Name, AV as SumAV from Archive where mode='sum' and interval='1m'and GN in ('W3.CLASS053.P160','W3.CLASS289.P209','W3.CLASS358.P390') and TM between '2021-01-15 18:00:00' and '2021-01-16 18:00:00' group by Time, Name
+#未缓存：5292ms
+#缓存：80ms
+
+#SQL6
+select * from Archive where GN in ('W3.CLASS078.P058','W3.CLASS258.P196','W3.CLASS306.P066') and TM between '2021-01-15 22:00:00' and '2021-01-16 05:00:00' and AV>150
+#未缓存：1204ms
+#缓存：70ms
+
+#SQL7
+select TM as Time, GN as Name,(MAXV-MINV) AS Difference from Stat where interval='1m' and GN in ('W3.CLASS036.P105','W3.CLASS198.P240','W3.CLASS375.P309') and TM between '2021-01-15 22:00:00' and '2021-01-15 23:00:00'
+#未缓存：482ms
+#缓存：20ms
+
+#SQL8
+select TM as Time, GN as Name, AV as Avg from Archive where mode='mean' and interval='1m'and GN in ('W3.CLASS102.P187','W3.CLASS362.P285','W3.CLASS476.P180') and TM between '2021-01-15 18:00:00' and '2021-01-16 18:00:00'
+#未缓存：5435ms
+#缓存：60ms
