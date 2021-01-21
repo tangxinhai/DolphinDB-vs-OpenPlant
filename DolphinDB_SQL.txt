@@ -1,0 +1,35 @@
+login("admin", "123456")
+pt = loadTable("dfs://svmDemo", "sensors")
+pnodeRun(clearAllCache)
+
+timer t = select * from pt  where ID=20 and TM=2020.10.01T05:00:00.000
+//未缓存：110ms
+//缓存：4.5ms
+
+timer t = select * from pt  where ID in (80 800 10800)  and TM between 2020.10.01T06:00:00.000  : 2020.10.01T06:30:00.000
+//未缓存：145ms
+//缓存：8ms
+
+timer t = select top 20 * from pt  where ID in (280 5800 68000)  and TM between 2020.10.01T06:00:00.000  : 2020.10.01T06:30:00.000 order by AV
+//未缓存：192ms
+//缓存：8.3ms
+
+timer t = select max(AV) as MAXV, min(AV) as MINV from pt  where ID=168 and TM between 2020.10.01T00:00:00.000  : 2020.10.01T23:59:59.999 group by minute(TM)
+//未缓存：105ms
+//缓存：9.5ms
+
+timer t = select sum(AV) as SumAV from pt  where ID in (950 5953 10555) and TM between 2020.10.01T00:00:00.000  : 2020.10.01T23:59:59.999 group by ID, minute(TM)
+//未缓存：229ms
+//缓存：13.5ms
+
+timer t = select * from pt  where ID in (12555 36888 66668) and TM between 2020.10.01T02:00:00.000  : 2020.10.01T09:00:00.000 and AV>53
+//未缓存：172ms
+//缓存：10ms
+
+timer t = select (max(AV) - min(AV)) as Difference from pt  where ID in (52365 168999 218668) and TM between 2020.10.01T03:00:00.000  : 2020.10.01T04:00:00.000 group by ID, minute(TM)
+//未缓存：146ms
+//缓存：9.3ms
+
+timer t = select avg(AV) as Avg from pt  where ID in (5368 18654 102558) and TM between 2020.10.01T00:00:00.000  : 2020.10.01T23:59:59.999 group by ID, minute(TM)
+//未缓存：148ms
+//缓存：15ms
